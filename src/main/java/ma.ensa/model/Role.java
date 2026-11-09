@@ -1,4 +1,3 @@
-
 package ma.ensa.model;
 
 public enum Role {
