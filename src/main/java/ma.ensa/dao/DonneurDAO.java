@@ -18,15 +18,16 @@ public class DonneurDAO {
 
     public Donneur findById(Long id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Donneur.class, id);
+            return session.createQuery(
+                    "SELECT d FROM Donneur d JOIN FETCH d.utilisateur WHERE d.id = :id",
+                    Donneur.class).setParameter("id", id).uniqueResult();
         }
     }
 
     public List<Donneur> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery(
-                    "FROM Donneur", Donneur.class
-            ).list();
+            return session.createQuery("SELECT d FROM Donneur d JOIN FETCH d.utilisateur",
+                    Donneur.class).list();
         }
     }
 

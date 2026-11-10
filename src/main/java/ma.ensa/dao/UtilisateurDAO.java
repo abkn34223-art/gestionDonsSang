@@ -58,4 +58,15 @@ public class UtilisateurDAO {
             tx.commit();
         }
     }
+    //empecher l'admin a modifier un donneur avec un email déjà utilisé par un autre utilisateur
+    public boolean emailExiste(String email, Long idExclu) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Long nombre = session.createQuery("SELECT COUNT(u) FROM Utilisateur u " +
+                                    "WHERE u.email = :email AND u.id != :id",
+                            Long.class).setParameter("email", email)
+                    .setParameter("id", idExclu)
+                    .uniqueResult();
+            return nombre > 0;
+        }
+    }
 }
