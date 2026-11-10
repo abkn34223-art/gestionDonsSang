@@ -1,3 +1,4 @@
+
 package ma.ensa.model;
 
 import jakarta.persistence.*;
@@ -19,15 +20,21 @@ public class RendezVous {
     @Enumerated(EnumType.STRING)
     private StatutRendezVous statut = StatutRendezVous.EN_ATTENTE;
 
+    // Relation avec Collecte
     @ManyToOne
     @JoinColumn(name = "collecte_id", nullable = false)
     private Collecte collecte;
 
-    // Ajouter ici la relation avec Donneur
-    // après vérification de la classe Donneur de ton binôme.
+    // Relation avec Donneur
+    @ManyToOne
+    @JoinColumn(name = "donneur_id", nullable = false)
+    private Donneur donneur;
 
+    // Constructeur vide
     public RendezVous() {
     }
+
+    // Getters et Setters
 
     public Long getId() {
         return id;
@@ -67,5 +74,13 @@ public class RendezVous {
 
     public void setCollecte(Collecte collecte) {
         this.collecte = collecte;
+    }
+
+    public Donneur getDonneur() {
+        return donneur;
+    }
+
+    public void setDonneur(Donneur donneur) {
+        this.donneur = donneur;
     }
 }
