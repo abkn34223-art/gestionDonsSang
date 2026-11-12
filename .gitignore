@@ -1,3 +1,6 @@
+# Configuration MySQL personnelle
+src/main/resources/db-local.properties
+
 target/
 .idea/
 *.iml
