@@ -9,15 +9,42 @@ import ma.ensa.model.Collecte;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 public class HibernateUtil {
 
     private static SessionFactory sessionFactory;
 
     static {
         try {
-            Configuration configuration = new Configuration();
+            // Charger les propriétés personnelles
+            Properties properties = new Properties();
 
+            InputStream input = HibernateUtil.class
+                    .getClassLoader()
+                    .getResourceAsStream("db-local.properties");
+
+            if (input == null) {
+                throw new RuntimeException("Fichier db-local.properties introuvable !");
+            }
+
+            properties.load(input);
+            input.close();
+
+            // Configurer Hibernate
+            Configuration configuration = new Configuration();
             configuration.configure("hibernate.cfg.xml");
+
+            configuration.setProperty(
+                    "hibernate.connection.username",
+                    properties.getProperty("db.username")
+            );
+
+            configuration.setProperty(
+                    "hibernate.connection.password",
+                    properties.getProperty("db.password")
+            );
 
             // Enregistrer les entités
             configuration.addAnnotatedClass(Utilisateur.class);
@@ -29,6 +56,7 @@ public class HibernateUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ExceptionInInitializerError(e);
         }
     }
 
@@ -36,4 +64,5 @@ public class HibernateUtil {
         return sessionFactory;
     }
 }
+
 
