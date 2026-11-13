@@ -27,6 +27,10 @@ public class Donneur {
     @JoinColumn(name = "utilisateur_id", nullable = false, unique = true)
     private Utilisateur utilisateur;
 
+    @OneToMany
+    @JoinColumn(nullable = false)
+    private  RendezVous rendezVous;
+
     public Donneur() {}
 
     public Donneur(LocalDate dateNaissance, String telephone,
