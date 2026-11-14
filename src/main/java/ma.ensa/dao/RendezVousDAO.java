@@ -1,99 +1,113 @@
-
 package ma.ensa.dao;
 
+import ma.ensa.util.HibernateUtil;
 import ma.ensa.model.RendezVous;
+import ma.ensa.model.StatutRendezVous;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import ma.ensa.util.HibernateUtil;
+
 import java.util.List;
 
 public class RendezVousDAO {
-
-    public void ajouter(RendezVous rendezVous) {
+    public void ajouter(RendezVous rendezVous){
         Transaction transaction = null;
-
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
             session.persist(rendezVous);
             transaction.commit();
-
-        } catch (Exception e) {
-            if (transaction != null) {
+        } catch (Exception e){
+            if (transaction != null && transaction.isActive()){
                 transaction.rollback();
             }
-            throw new RuntimeException("Erreur lors de l'ajout", e);
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de l'ajout du rendez-vous", e);
         }
     }
-
-    public List<RendezVous> lister() {
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
-            return session.createQuery(
-                    "SELECT r FROM RendezVous r " +
-                            "LEFT JOIN FETCH r.collecte " +
-                            "LEFT JOIN FETCH r.donneur",
-                    RendezVous.class
-            ).list();
-        }
-    }
-
-    public RendezVous trouverParId(Long id) {
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
-            return session.createQuery(
-                            "SELECT r FROM RendezVous r " +
-                                    "LEFT JOIN FETCH r.collecte " +
-                                    "LEFT JOIN FETCH r.donneur " +
-                                    "WHERE r.id = :id",
-                            RendezVous.class
-                    ).setParameter("id", id)
-                    .uniqueResult();
-        }
-    }
-
-    public List<RendezVous> trouverParDonneur(Long donneurId) {
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
-            return session.createQuery(
-                            "FROM RendezVous r WHERE r.donneur.id = :id",
-                            RendezVous.class
-                    ).setParameter("id", donneurId)
-                    .list();
-        }
-    }
-
-    public List<RendezVous> trouverParCollecte(Long collecteId) {
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
-            return session.createQuery(
-                            "FROM RendezVous r WHERE r.collecte.id = :id",
-                            RendezVous.class
-                    ).setParameter("id", collecteId)
-                    .list();
-        }
-    }
-
-    public void modifier(RendezVous rendezVous) {
+    public void modifier(RendezVous rendezvous){
         Transaction transaction = null;
-
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
             transaction = session.beginTransaction();
-            session.merge(rendezVous);
+            session.merge(rendezvous);
             transaction.commit();
-
-        } catch (Exception e) {
-            if (transaction != null) {
+        }catch (Exception e){
+            if (transaction != null && transaction.isActive()){
                 transaction.rollback();
             }
-            throw new RuntimeException("Erreur lors de la modification", e);
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la modification du rendez vous", e);
+        }
+    }
+    public void supprimer(Long id){
+        Transaction transaction = null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            RendezVous rendezVous = session.find(RendezVous.class, id);
+            if(rendezVous != null){
+                session.remove(rendezVous);
+            }
+            transaction.commit();
+        }catch (Exception e){
+            if (transaction != null && transaction.isActive()){
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la suppression du rendez vous", e);
+        }
+    }
+    public RendezVous trouverParId(Long id){
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            return session.find(RendezVous.class, id);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la recherche du rendez vous", e);
+        }
+    }
+    public List<RendezVous> lister(){
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            return session.createQuery(
+                    "FROM RendezVous", RendezVous.class
+            ).getResultList();
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException( "Erreur lors de la récupération des rendez vous", e);
+        }
+    }
+    public void mettreAJourStatut(Long id, StatutRendezVous newStatut){
+        Transaction transaction = null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            RendezVous rendezVous = session.find(RendezVous.class, id);
+            if (rendezVous != null){
+                rendezVous.setStatut(newStatut);
+            }
+            transaction.commit();
+        }catch (Exception e){
+            if (transaction != null && transaction.isActive()){
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la mise à jour du statut de le rendez vous", e);
+        }
+    }
+    public List<RendezVous> listerParCollecte(Long collecteId){
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            return session.createQuery(
+                            "FROM RendezVous r WHERE r.collecte.id = :colId",
+                            RendezVous.class).setParameter("colId", collecteId)
+                    .getResultList();
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la récupération des rendez-vous de la collecte", e);
+        }
+    }
+    public List<RendezVous> listerParDonneur(Long donneurId){
+        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+            return session.createQuery("FROM RendezVous r WHERE r.donneur.id = :donId",
+                            RendezVous.class).setParameter("donId", donneurId)
+                    .getResultList();
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la récupération des rendez-vous du donneur", e);
         }
     }
 }
