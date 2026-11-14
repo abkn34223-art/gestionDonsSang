@@ -12,9 +12,7 @@ public class CollecteDAO {
     public void ajouter(Collecte collecte) {
         Transaction transaction = null;
 
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
-
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.persist(collecte);
             transaction.commit();
@@ -28,8 +26,7 @@ public class CollecteDAO {
     }
 
     public List<Collecte> lister() {
-        try (Session session =
-                     HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 
             return session.createQuery(
                     "FROM Collecte ORDER BY dateCollecte",

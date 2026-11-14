@@ -1,11 +1,6 @@
 
 package ma.ensa.util;
 
-import ma.ensa.model.Utilisateur;
-import ma.ensa.model.Donneur;
-import ma.ensa.model.RendezVous;
-import ma.ensa.model.Collecte;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -14,21 +9,17 @@ import java.util.Properties;
 
 public class HibernateUtil {
 
-    private static SessionFactory sessionFactory;
+    private static final SessionFactory sessionFactory =
+            buildSessionFactory();
 
-    static {
+    private static SessionFactory buildSessionFactory() {
         try {
-            Configuration configuration = new Configuration();
-
-            // Charger la configuration Hibernate
-            configuration.configure("hibernate.cfg.xml");
-
-            // Charger les identifiants MySQL personnels
+            // Charger les identifiants MySQL
             Properties properties = new Properties();
 
-            try (InputStream input =
-                         HibernateUtil.class.getClassLoader()
-                                 .getResourceAsStream("db-local.properties")) {
+            try (InputStream input = HibernateUtil.class
+                    .getClassLoader()
+                    .getResourceAsStream("db-local.properties")) {
 
                 if (input == null) {
                     throw new RuntimeException(
@@ -39,16 +30,20 @@ public class HibernateUtil {
                 properties.load(input);
             }
 
+            // Vérifier les identifiants
             String username = properties.getProperty("db.username");
-            String password = properties.getProperty("db.password");
+            String password = properties.getProperty("db.password", "");
 
-            if (username == null || password == null) {
+            if (username == null || username.isBlank()) {
                 throw new RuntimeException(
-                        "Identifiants MySQL manquants"
+                        "Nom d'utilisateur MySQL manquant"
                 );
             }
 
-            // Configurer les identifiants de connexion
+            // Charger la configuration Hibernate
+            Configuration configuration =
+                    new Configuration().configure("hibernate.cfg.xml");
+
             configuration.setProperty(
                     "hibernate.connection.username", username
             );
@@ -57,24 +52,10 @@ public class HibernateUtil {
                     "hibernate.connection.password", password
             );
 
-            // Enregistrer les entités
-            configuration.addAnnotatedClass(Utilisateur.class);
-            configuration.addAnnotatedClass(Donneur.class);
-            configuration.addAnnotatedClass(RendezVous.class);
-            configuration.addAnnotatedClass(Collecte.class);
-
-            // Construire la SessionFactory
-            sessionFactory = configuration.buildSessionFactory();
-
-            System.out.println("Hibernate initialisé avec succès !");
+            return configuration.buildSessionFactory();
 
         } catch (Exception e) {
-            System.err.println(
-                    "Erreur lors de l'initialisation de Hibernate :"
-            );
-
             e.printStackTrace();
-
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -84,7 +65,7 @@ public class HibernateUtil {
     }
 
     public static void shutdown() {
-        if (sessionFactory != null && !sessionFactory.isClosed()) {
+        if (sessionFactory != null) {
             sessionFactory.close();
         }
     }

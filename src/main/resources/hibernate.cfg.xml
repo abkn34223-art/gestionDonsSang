@@ -13,21 +13,27 @@
         </property>
 
         <property name="hibernate.connection.url">
-            jdbc:mysql://localhost:3306/gestion_dons_sang?createDatabaseIfNotExist=true&amp;useSSL=false&amp;serverTimezone=UTC
+            jdbc:mysql://localhost:3306/gestion_dons_sang?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC
         </property>
 
-        <!-- Les identifiants seront chargés localement -->
-
-        <!-- Hibernate -->
         <property name="hibernate.dialect">
             org.hibernate.dialect.MySQLDialect
         </property>
 
+        <!-- Affichage SQL -->
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
-        <!-- Création et mise à jour des tables -->
+        <!-- Conserver les tables et mettre à jour leur structure -->
         <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <property name="hibernate.connection.characterEncoding">UTF-8</property>
+
+        <!-- Entités -->
+        <mapping class="ma.ensa.model.Collecte"/>
+        <mapping class="ma.ensa.model.RendezVous"/>
+        <mapping class="ma.ensa.model.Donneur"/>
+        <mapping class="ma.ensa.model.Utilisateur"/>
 
     </session-factory>
 </hibernate-configuration>

@@ -2,6 +2,8 @@ package ma.ensa.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "donneurs")
@@ -29,7 +31,7 @@ public class Donneur {
 
     @OneToMany
     @JoinColumn(nullable = false)
-    private  RendezVous rendezVous;
+    private List<RendezVous> rendezVous = new ArrayList<>();
 
     public Donneur() {}
 
