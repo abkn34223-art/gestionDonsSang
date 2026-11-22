@@ -1,126 +1,124 @@
-
 package ma.ensa.service;
 
+import ma.ensa.dao.CollecteDAO;
+import ma.ensa.dao.DonneurDAO;
+import ma.ensa.model.*;
 import ma.ensa.dao.RendezVousDAO;
-import ma.ensa.model.RendezVous;
-import ma.ensa.model.StatutRendezVous;
-
 import java.util.List;
 
 public class RendezVousService {
-
-    private final RendezVousDAO rendezVousDAO = new RendezVousDAO();
-
-    // Demander un rendez-vous
-    public void demanderRendezVous(RendezVous rendezVous) {
-
-        if (rendezVous == null) {
-            throw new IllegalArgumentException(
-                    "Le rendez-vous ne peut pas être null."
-            );
+    private RendezVousDAO rendezVousDAO;
+    private CollecteDAO collecteDAO;
+    private DonneurDAO donneurDAO;
+    public RendezVousService(){
+        this.rendezVousDAO = new RendezVousDAO();
+        this.collecteDAO = new CollecteDAO();
+        this.donneurDAO = new DonneurDAO();
+    }
+    public void demanderRendezVous(RendezVous rendezVous){
+        if(rendezVous == null){
+            throw new IllegalArgumentException("Rendez-vous invalide.");
         }
-
-        if (rendezVous.getCollecte() == null) {
-            throw new IllegalArgumentException(
-                    "Une collecte doit être sélectionnée."
-            );
+        if(rendezVous.getCollecte()==null || rendezVous.getCollecte().getId()==null){
+            throw new IllegalArgumentException("Une collecte doit être sélectionnée.");
         }
-
-        if (rendezVous.getDonneur() == null) {
-            throw new IllegalArgumentException(
-                    "Un donneur doit être associé au rendez-vous."
-            );
+        Collecte collecte = collecteDAO.trouverParId(rendezVous.getCollecte().getId());
+        if (collecte == null){
+            throw new IllegalArgumentException("Collecte introuvable.");
         }
-
-        rendezVous.setStatut(StatutRendezVous.EN_ATTENTE);
+        if (collecte.getStatut() != StatutCollecte.PLANIFIEE){
+            throw new IllegalArgumentException("Cette collecte n'est pas disponible.");
+        }
+        if (rendezVous.getDonneur()==null || rendezVous.getDonneur().getId() == null){
+            throw new IllegalArgumentException("Un donneur doit être associé au rendez-vous.");
+        }
+        Donneur donneur = donneurDAO.findById(rendezVous.getDonneur().getId());
+        if (donneur ==null){
+            throw new IllegalArgumentException("Donneur introuvable.");
+        }
+        Utilisateur utilisateur = donneur.getUtilisateur();
+        if (utilisateur == null || utilisateur.getRole() != Role.DONNEUR){
+            throw new IllegalArgumentException("Utilisateur non autorisé.");
+        }
+        List<RendezVous> rendezVousList = rendezVousDAO.listerParCollecte(collecte.getId());
+        Long nbrplaceoccup = rendezVousList.stream()
+                .filter(r -> r.getStatut() != StatutRendezVous.ANNULE)
+                .count();
+        if(nbrplaceoccup >= collecte.getCapaciteMaximale()){
+            throw new IllegalArgumentException("La capacité maximale de cette collecte est atteinte.");
+        }
+        List<RendezVous> rendezVousDonneur = rendezVousDAO.listerParDonneur(donneur.getId());
+        for (RendezVous r: rendezVousDonneur){
+            if (r.getCollecte().getId().equals(collecte.getId())
+            && (r.getStatut()== StatutRendezVous.EN_ATTENTE || r.getStatut() == StatutRendezVous.CONFIRME)){
+                throw new IllegalArgumentException("Ce donneur possède déjà un rendez-vous pour cette collecte.");
+            }
+        }
+        rendezVousDAO.mettreAJourStatut(StatutRendezVous.EN_ATTENTE);
         rendezVousDAO.ajouter(rendezVous);
     }
-
-    // Lister tous les rendez-vous
-    public List<RendezVous> listerRendezVous() {
-        return rendezVousDAO.lister();
+    public void confirmerRendezVous(Long id){
+        if(id == null){
+            throw new IllegalArgumentException("Identifiant invalide.");
+        }
+        RendezVous rendezVous = rendezVousDAO.trouverParId(id);
+        if (rendezVous == null){
+            throw new IllegalArgumentException("Rendez-vous introuvable.");
+        }
+        if(rendezVous.getStatut() != StatutRendezVous.EN_ATTENTE){
+            throw new IllegalArgumentException("Ce rendez-vous ne peut pas être confirmé.");
+        }
+        rendezVousDAO.mettreAJourStatut(id, StatutRendezVous.CONFIRME);
     }
-
-    // Chercher un rendez-vous par son identifiant
-    public RendezVous trouverParId(Long id) {
-
+    public void annulerRendezVous(Long id){
+        if (id == null){
+            throw new IllegalArgumentException("Identifiant invalide.");
+        }
+        RendezVous rendezVous = rendezVousDAO.trouverParId(id);
+        if (rendezVous == null){
+            throw new IllegalArgumentException("Rendez-vous introuvable.");
+        }
+        if (rendezVous.getStatut() != StatutRendezVous.EN_ATTENTE
+            && rendezVous.getStatut() != StatutRendezVous.CONFIRME){
+            throw new IllegalArgumentException("Ce rendez-vous ne peut pas être annulé.");
+        }
+        rendezVousDAO.mettreAJourStatut(id,StatutRendezVous.ANNULE);
+    }
+    public void marquerCommeEffectue(Long id){
+        if (id == null){
+            throw new IllegalArgumentException("Identifiant invalide.");
+        }
+        RendezVous rendezVous = rendezVousDAO.trouverParId(id);
+        if (rendezVous == null){
+            throw new IllegalArgumentException("Rendez-vous introuvable.");
+        }
+        if (rendezVous.getStatut() != StatutRendezVous.CONFIRME){
+            throw new IllegalArgumentException("Seul un rendez-vous confirmé peut être effectué.");
+        }
+        rendezVousDAO.mettreAJourStatut(id, StatutRendezVous.EFFECTUE);
+    }
+    public RendezVous trouverParId(Long id){
+        if (id == null){
+            throw new IllegalArgumentException("Identifiant invalide.");
+        }
         return rendezVousDAO.trouverParId(id);
     }
-
-    // Lister les rendez-vous d'un donneur
-    public List<RendezVous> listerParDonneur(Long donneurId) {
-
-        return rendezVousDAO.listerParDonneur(donneurId);
+    public List<RendezVous> listerRendezVous(){
+        return rendezVousDAO.lister();
     }
-
-    // Lister les rendez-vous d'une collecte
-    public List<RendezVous> listerParCollecte(Long collecteId) {
-
-        return rendezVousDAO.listerParCollecte(collecteId);
+    public List<RendezVous> listerParCollecte(Long idcol){
+        if (idcol == null){
+            throw new IllegalArgumentException("Collecte invalide.");
+        }
+        if (collecteDAO.trouverParId(idcol)==null){
+            throw new IllegalArgumentException("Collecte introuvable.");
+        }
+        return rendezVousDAO.listerParCollecte(idcol);
     }
-
-    // Confirmer un rendez-vous
-    public void confirmerRendezVous(Long id) {
-
-        RendezVous rendezVous = trouverParId(id);
-
-        if (rendezVous == null) {
-            throw new IllegalArgumentException(
-                    "Rendez-vous introuvable."
-            );
+    public List<RendezVous> listerParDonneur(Long iddon){
+        if (iddon == null){
+            throw new IllegalArgumentException("Donneur invalide");
         }
-
-        if (rendezVous.getStatut() != StatutRendezVous.EN_ATTENTE) {
-            throw new IllegalStateException(
-                    "Ce rendez-vous ne peut pas être confirmé."
-            );
-        }
-
-        rendezVous.setStatut(StatutRendezVous.CONFIRME);
-        rendezVousDAO.modifier(rendezVous);
-    }
-
-    // Annuler un rendez-vous
-    public void annulerRendezVous(Long id) {
-
-        RendezVous rendezVous = trouverParId(id);
-
-        if (rendezVous == null) {
-            throw new IllegalArgumentException(
-                    "Rendez-vous introuvable."
-            );
-        }
-
-        if (rendezVous.getStatut() != StatutRendezVous.EN_ATTENTE
-                && rendezVous.getStatut() != StatutRendezVous.CONFIRME) {
-
-            throw new IllegalStateException(
-                    "Ce rendez-vous ne peut pas être annulé."
-            );
-        }
-
-        rendezVous.setStatut(StatutRendezVous.ANNULE);
-        rendezVousDAO.modifier(rendezVous);
-    }
-
-    // Marquer un rendez-vous comme effectué
-    public void marquerCommeEffectue(Long id) {
-
-        RendezVous rendezVous = trouverParId(id);
-
-        if (rendezVous == null) {
-            throw new IllegalArgumentException(
-                    "Rendez-vous introuvable."
-            );
-        }
-
-        if (rendezVous.getStatut() != StatutRendezVous.CONFIRME) {
-            throw new IllegalStateException(
-                    "Seul un rendez-vous confirmé peut être effectué."
-            );
-        }
-
-        rendezVous.setStatut(StatutRendezVous.EFFECTUE);
-        rendezVousDAO.modifier(rendezVous);
+        return rendezVousDAO.listerParDonneur(iddon);
     }
 }
