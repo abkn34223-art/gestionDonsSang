@@ -6,7 +6,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "donneurs")
 public class Donneur {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +27,6 @@ public class Donneur {
     private Utilisateur utilisateur;
 
     public Donneur() {}
-
     public Donneur(LocalDate dateNaissance, String telephone,
                    String groupeSanguin, String adresse,
                    Utilisateur utilisateur) {
@@ -42,43 +40,33 @@ public class Donneur {
     public Long getId() {
         return id;
     }
-
     public LocalDate getDateNaissance() {
         return dateNaissance;
     }
-
     public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
-
     public String getTelephone() {
         return telephone;
     }
-
     public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
-
     public String getGroupeSanguin() {
         return groupeSanguin;
     }
-
     public void setGroupeSanguin(String groupeSanguin) {
         this.groupeSanguin = groupeSanguin;
     }
-
     public String getAdresse() {
         return adresse;
     }
-
     public void setAdresse(String adresse) {
         this.adresse = adresse;
     }
-
     public Utilisateur getUtilisateur() {
         return utilisateur;
     }
-
     public void setUtilisateur(Utilisateur utilisateur) {
         this.utilisateur = utilisateur;
     }

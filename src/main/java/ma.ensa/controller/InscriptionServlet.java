@@ -17,7 +17,7 @@ public class InscriptionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/inscription.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/inscription.jsp").forward(request, response);
     }
 
     @Override
@@ -37,11 +37,10 @@ public class InscriptionServlet extends HttpServlet {
             utilisateurService.inscrire(nom, prenom, email, motDePasse, dateNaissance,
                     telephone, groupeSanguin, adresse);
 
-            response.sendRedirect(request.getContextPath() + "/login.jsp?inscription=success");
+            response.sendRedirect(request.getContextPath() + "/connexion?inscription=success");
 
         } catch (Exception e) {request.setAttribute("erreur", e.getMessage());
-
-            request.getRequestDispatcher("/inscription.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/inscription.jsp").forward(request, response);
         }
     }
 }

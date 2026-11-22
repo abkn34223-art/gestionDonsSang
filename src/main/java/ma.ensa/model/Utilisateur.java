@@ -1,5 +1,4 @@
 package ma.ensa.model;
-
 import jakarta.persistence.*;
 
 @Entity

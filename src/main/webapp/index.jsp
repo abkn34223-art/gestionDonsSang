@@ -46,17 +46,12 @@
 
 <body>
 <header><h2>Gestion des dons de sang</h2></header>
-
 <div class="container">
     <h1>Bienvenue sur notre plateforme</h1>
-
     <p>Ensemble, sauvons des vies grâce au don de sang.</p>
-
-    <a href="login.jsp" class="btn">Se connecter</a>
-
-    <a href="inscription.jsp" class="btn">Créer un compte</a>
+    <a href="<%= request.getContextPath() %>/connexion">Se connecter</a>
+    <a href="<%= request.getContextPath() %>/inscription">S'inscrire</a>
 </div>
-
 </body>
 </html>
 

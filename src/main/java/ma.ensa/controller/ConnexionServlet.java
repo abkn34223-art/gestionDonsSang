@@ -14,6 +14,14 @@ public class ConnexionServlet extends HttpServlet {
     private UtilisateurService utilisateurService = new UtilisateurService();
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.getRequestDispatcher("/WEB-INF/views/login.jsp")
+                .forward(request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -26,13 +34,13 @@ public class ConnexionServlet extends HttpServlet {
             session.setAttribute("utilisateur", utilisateur);
 
             if (utilisateur.getRole() == ma.ensa.model.Role.ADMIN) {
-                response.sendRedirect(request.getContextPath() + "/admin.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin");
             } else {
-                response.sendRedirect(request.getContextPath() + "/profil.jsp");
+                response.sendRedirect(request.getContextPath() + "/profil");
             }
 
         } catch (Exception e) {request.setAttribute("erreur", e.getMessage());
-            request.getRequestDispatcher("/login.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp")
                     .forward(request, response);
         }
     }

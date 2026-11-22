@@ -5,22 +5,13 @@
 
 <hibernate-configuration>
     <session-factory>
-        <!-- Connexion MySQL -->
-        <property name="hibernate.connection.driver_class">
-            com.mysql.cj.jdbc.Driver
-        </property>
-
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="hibernate.connection.url">
-            jdbc:mysql://localhost:3306/gestion_dons_sang?createDatabaseIfNotExist=true&amp;useSSL=false&amp;serverTimezone=UTC
+            jdbc:mysql://localhost:3306/gestion_dons_sang?createDatabaseIfNotExist=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC
         </property>
-
-        <!-- Hibernate -->
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
-
-        <!-- Création et mise à jour automatique des tables -->
         <property name="hibernate.hbm2ddl.auto">update</property>
-
     </session-factory>
 </hibernate-configuration>

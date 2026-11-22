@@ -22,31 +22,34 @@ public class DonneurServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!estAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+        if (!estAdmin(request)) {response.sendRedirect(request.getContextPath() + "/connexion");
             return;
         }
 
         String action = request.getParameter("action");
 
-        if ("modifier".equals(action)) {
-            try {
-                Long id = Long.parseLong(request.getParameter("id"));
-                Donneur donneur = donneurService.chercherDonneur(id);
+        if ("supprimer".equals(action)) {
+            try {Long id = Long.parseLong(request.getParameter("id"));
+                donneurService.supprimerDonneur(id);
+                response.sendRedirect(request.getContextPath() + "/donneurs?suppression=success");
+            } catch (Exception e) {response.sendRedirect(request.getContextPath() + "/donneurs?suppression=error");
+            }return;
+        }
 
+        if ("modifier".equals(action)) {
+            try {Long id = Long.parseLong(request.getParameter("id"));
+                Donneur donneur = donneurService.chercherDonneur(id);
                 if (donneur == null) {response.sendRedirect(request.getContextPath() + "/donneurs");
                     return;
                 }
-
                 request.setAttribute("donneur", donneur);
-                request.getRequestDispatcher("/modifier-donneur.jsp").forward(request, response);
-
-            } catch (NumberFormatException e) {response.sendRedirect(request.getContextPath() + "/donneurs");
-            }
-
+                request.getRequestDispatcher("/WEB-INF/views/modifier-donneur.jsp"
+                ).forward(request, response);
+            } catch (NumberFormatException e) {response.sendRedirect(request.getContextPath() + "/donneurs");}
         } else {
             request.setAttribute("donneurs", donneurService.listerDonneurs());
-            request.getRequestDispatcher("/donneurs.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/donneurs.jsp"
+            ).forward(request, response);
         }
     }
 
@@ -54,9 +57,8 @@ public class DonneurServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (!estAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
+            response.sendRedirect(request.getContextPath() + "/WEB-INF/views/login.jsp");
+            return;}
 
         request.setCharacterEncoding("UTF-8");
         try {Long id = Long.parseLong(request.getParameter("id"));
@@ -70,9 +72,7 @@ public class DonneurServlet extends HttpServlet {
                     request.getParameter("groupeSanguin"),
                     request.getParameter("adresse")
             );
-
-            response.sendRedirect(request.getContextPath() + "/donneurs?modification=success"
-            );
+            response.sendRedirect(request.getContextPath() + "/donneurs?modification=success");
 
         } catch (Exception e) {response.sendRedirect(request.getContextPath() + "/donneurs?erreur=modification");
         }

@@ -4,13 +4,7 @@
 <%@ page import="ma.ensa.model.Utilisateur" %>
 <%@ page import="ma.ensa.model.Role" %>
 
-<%  Utilisateur admin = (Utilisateur) session.getAttribute("utilisateur");
-    if (admin == null || admin.getRole() != Role.ADMIN) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;}
-
-    List<Donneur> donneurs = (List<Donneur>) request.getAttribute("donneurs");
-%>
+<%  List<Donneur> donneurs = (List<Donneur>) request.getAttribute("donneurs"); %>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -54,6 +48,14 @@
 <body>
 
 <h1>Liste des donneurs</h1>
+<% String suppression = request.getParameter("suppression");
+    if ("success".equals(suppression)) { %>
+<p style="color: green;">Donneur supprimé avec succès !</p>
+<% }
+    else if ("error".equals(suppression)) { %>
+<p style="color: red;">Impossible de supprimer ce donneur. Il possède peut-être des rendez-vous.</p>
+<%  }  %>
+
 <table>
     <tr>
         <th>Actions</th>
@@ -71,7 +73,11 @@
     %>
 
     <tr>
-        <td><a href="donneurs?action=modifier&id=<%= donneur.getId() %>">Modifier</a></td>
+        <td> <a href="donneurs?action=modifier&id=<%= donneur.getId() %>">Modifier</a>
+
+            <a href="<%= request.getContextPath() %>/donneurs?action=supprimer&id=<%= donneur.getId() %>"
+               onclick="return confirm('Voulez-vous vraiment supprimer ce donneur ?');">Supprimer</a>
+        </td>
         <td><%= donneur.getId() %></td>
         <td><%= utilisateur.getNom() %></td>
         <td><%= utilisateur.getPrenom() %></td>
@@ -88,7 +94,7 @@
 
 </table>
 <br>
-<a href="admin.jsp">Retour au tableau de bord</a>
+<a href="<%= request.getContextPath() %>/admin">Retour au tableau de bord</a>
 
 </body>
 </html>

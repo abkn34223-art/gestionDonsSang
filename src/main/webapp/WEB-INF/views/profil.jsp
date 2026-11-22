@@ -21,7 +21,7 @@
 <p>Email : <%= utilisateur.getEmail() %></p>
 <p>Rôle : <%= utilisateur.getRole() %></p>
 
-<a href="deconnexion">Se déconnecter</a>
+<a href="${pageContext.request.contextPath}/deconnexion">Se déconnecter</a>
 
 </body>
 </html>
