@@ -42,7 +42,7 @@ public class DonneurService {
     }
 
     public boolean possedeDesRendezVous(Long donneurId) {
-        List<RendezVous> rendezVous = rendezVousDAO.trouverParDonneur(donneurId);
+        List<RendezVous> rendezVous = rendezVousDAO.listerParDonneur(donneurId);
         return !rendezVous.isEmpty();
     }
 

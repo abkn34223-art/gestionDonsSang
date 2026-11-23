@@ -2,6 +2,8 @@ package ma.ensa.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "donneurs")
@@ -25,6 +27,10 @@ public class Donneur {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "utilisateur_id", nullable = false, unique = true)
     private Utilisateur utilisateur;
+
+    @OneToMany
+    @JoinColumn(nullable = false)
+    private List<RendezVous> rendezVous = new ArrayList<>();
 
     public Donneur() {}
     public Donneur(LocalDate dateNaissance, String telephone,
