@@ -56,6 +56,17 @@
 <p style="color: red;">Impossible de supprimer ce donneur. Il possède peut-être des rendez-vous.</p>
 <%  }  %>
 
+<%  String modification = request.getParameter("modification");
+    String erreur = request.getParameter("erreur");
+    if ("success".equals(modification)) {
+%>
+<p style="color: green;">Donneur modifié avec succès !</p>
+<%
+} else if ("modification".equals(erreur)) {
+%>
+<p style="color: red;">Erreur lors de la modification du donneur.</p>
+<%  }    %>
+
 <table>
     <tr>
         <th>Actions</th>
@@ -73,7 +84,7 @@
     %>
 
     <tr>
-        <td> <a href="donneurs?action=modifier&id=<%= donneur.getId() %>">Modifier</a>
+        <a href="<%= request.getContextPath() %>/donneurs?action=modifier&id=<%= donneur.getId() %>">Modifier</a>
 
             <a href="<%= request.getContextPath() %>/donneurs?action=supprimer&id=<%= donneur.getId() %>"
                onclick="return confirm('Voulez-vous vraiment supprimer ce donneur ?');">Supprimer</a>

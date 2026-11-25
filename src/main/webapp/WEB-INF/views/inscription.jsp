@@ -54,7 +54,7 @@
     <p class="erreur"><%= request.getAttribute("erreur") %></p>
     <% } %>
 
-    <form action="inscription" method="post">
+    <form action="<%= request.getContextPath() %>/inscription" method="post">
         <input type="text" name="nom" placeholder="Nom" required>
 
         <input type="text" name="prenom" placeholder="Prénom" required>
@@ -85,7 +85,7 @@
         <button type="submit">S'inscrire</button>
     </form>
 
-    <p style="text-align:center;"> Déjà inscrit ?  <a href="login.jsp">Se connecter</a></p>
+    <p style="text-align:center;"> Déjà inscrit ? <a href="<%= request.getContextPath() %>/connexion">Se connecter</a></p>
 
 </div>
 </body>

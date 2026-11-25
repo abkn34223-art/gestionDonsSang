@@ -2,7 +2,7 @@
 <%@ page import="ma.ensa.model.Utilisateur" %>
 
 <% Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
-    if (utilisateur == null) {response.sendRedirect("login.jsp");
+    if (utilisateur == null) { response.sendRedirect(request.getContextPath() + "/connexion");
         return;}
 %>
 

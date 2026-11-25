@@ -30,6 +30,7 @@ public class ConnexionServlet extends HttpServlet {
 
         try {
             Utilisateur utilisateur = utilisateurService.connecter(email, motDePasse);
+            request.changeSessionId();
             HttpSession session = request.getSession();
             session.setAttribute("utilisateur", utilisateur);
 

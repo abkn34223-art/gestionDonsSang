@@ -57,7 +57,7 @@ public class DonneurServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (!estAdmin(request)) {
-            response.sendRedirect(request.getContextPath() + "/WEB-INF/views/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/connexion");
             return;}
 
         request.setCharacterEncoding("UTF-8");

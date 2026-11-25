@@ -28,6 +28,8 @@ public class DonneurService {
 
         if (donneur == null) {throw new RuntimeException("Donneur introuvable !");}
         Utilisateur utilisateur = donneur.getUtilisateur();
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("L'email est obligatoire !");}
         if (utilisateurDAO.emailExiste(email, utilisateur.getId())) {
             throw new RuntimeException("Cet email est déjà utilisé par un autre utilisateur !");}
 

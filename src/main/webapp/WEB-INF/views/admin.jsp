@@ -3,7 +3,7 @@
 
 <%  Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
     if (utilisateur == null || !utilisateur.getRole().name().equals("ADMIN")) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect(request.getContextPath() + "/connexion");
         return;}
 %>
 
