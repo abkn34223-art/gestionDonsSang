@@ -28,8 +28,7 @@ public class Donneur {
     @JoinColumn(name = "utilisateur_id", nullable = false, unique = true)
     private Utilisateur utilisateur;
 
-    @OneToMany
-    @JoinColumn(nullable = false)
+    @OneToMany(mappedBy = "donneur")
     private List<RendezVous> rendezVous = new ArrayList<>();
 
     public Donneur() {}
@@ -76,4 +75,6 @@ public class Donneur {
     public void setUtilisateur(Utilisateur utilisateur) {
         this.utilisateur = utilisateur;
     }
+    public List<RendezVous> getRendezVous() {return rendezVous;}
+    public void setRendezVous(List<RendezVous> rendezVous) {this.rendezVous = rendezVous;}
 }

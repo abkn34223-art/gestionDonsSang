@@ -4,6 +4,7 @@ import ma.ensa.model.Utilisateur;
 import ma.ensa.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import java.util.List;
 
 public class UtilisateurDAO {
 
@@ -73,6 +74,13 @@ public class UtilisateurDAO {
             if (idExclu != null) {query.setParameter("id", idExclu);}
             Long nombre = query.uniqueResult();
             return nombre > 0;
+        }
+    }
+
+    public List<Utilisateur> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Utilisateur",
+                    Utilisateur.class).getResultList();
         }
     }
 }
