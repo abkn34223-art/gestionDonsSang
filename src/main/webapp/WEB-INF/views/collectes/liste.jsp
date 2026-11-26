@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" %>
-<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
@@ -7,6 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Liste des collectes</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 
     <style>
         body {
@@ -22,56 +24,88 @@
             background: white;
             padding: 25px;
             border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        h1 {
-            color: #b71c1c;
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
         }
 
-        .btn {
+        .btn-ajouter {
             display: inline-block;
-            padding: 9px 14px;
-            border: none;
+            background: #198754;
+            color: white;
+            padding: 10px 15px;
             border-radius: 5px;
             text-decoration: none;
-            color: white;
-            cursor: pointer;
-            margin: 2px;
+            margin-bottom: 20px;
         }
-
-        .add { background: #198754; }
-        .edit { background: #0d6efd; }
-        .cancel { background: #dc3545; }
-        .details { background: #6c757d; }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 25px;
         }
 
         th, td {
             padding: 13px;
-            border: 1px solid #ddd;
             text-align: center;
+            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background: #b71c1c;
+            background: #343a40;
             color: white;
         }
 
-        tr:nth-child(even) {
-            background: #f8f8f8;
+        tr:hover {
+            background: #f8f9fa;
         }
 
-        .status {
-            font-weight: bold;
+        .actions {
+            white-space: nowrap;
         }
 
-        .empty {
-            text-align: center;
-            padding: 25px;
+        .icon-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 17px;
+            margin: 0 6px;
+            text-decoration: none;
+        }
+
+        .modifier {
+            color: #0d6efd;
+        }
+
+        .annuler {
+            color: #fd7e14;
+        }
+
+        .supprimer {
+            color: #dc3545;
+        }
+
+        .rendezvous {
+            display: inline-block;
+            background: #0d6efd;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #e8f5e9;
+            color: #256029;
+        }
+
+        .vide {
+            padding: 20px;
             color: #777;
         }
     </style>
@@ -81,21 +115,40 @@
 
 <div class="container">
 
-    <h1>Gestion des collectes de sang</h1>
+    <h2>
+        <i class="fas fa-hand-holding-medical"></i>
+        Liste des collectes
+    </h2>
 
-    <p>Consulter et gérer les collectes organisées.</p>
+    <c:if test="${param.success == 'ajout'}">
+        <div class="message">Collecte ajoutée avec succès.</div>
+    </c:if>
 
-    <a href="${pageContext.request.contextPath}/collectes?action=ajouterForm"
-       class="btn add">
-        + Ajouter une collecte
-    </a>
+    <c:if test="${param.success == 'modification'}">
+        <div class="message">Collecte modifiée avec succès.</div>
+    </c:if>
+
+    <c:if test="${param.success == 'annulation'}">
+        <div class="message">Collecte annulée avec succès.</div>
+    </c:if>
+
+    <c:if test="${param.success == 'suppression'}">
+        <div class="message">Collecte supprimée avec succès.</div>
+    </c:if>
+
+    <!-- Bouton réservé à l'administrateur -->
+    <c:if test="${sessionScope.utilisateur.role == 'ADMIN'}">
+        <a class="btn-ajouter"
+           href="${pageContext.request.contextPath}/collectes?action=ajouter">
+            <i class="fas fa-plus"></i>
+            Ajouter une collecte
+        </a>
+    </c:if>
 
     <table>
-
         <thead>
         <tr>
             <th>ID</th>
-            <th>Nom</th>
             <th>Date</th>
             <th>Heure début</th>
             <th>Heure fin</th>
@@ -108,70 +161,111 @@
 
         <tbody>
 
-        <c:forEach var="collecte" items="${collectes}">
+        <c:choose>
+            <c:when test="${empty collectes}">
+                <tr>
+                    <td colspan="8" class="vide">
+                        Aucune collecte trouvée.
+                    </td>
+                </tr>
+            </c:when>
 
-            <tr>
+            <c:otherwise>
+                <c:forEach var="collecte" items="${collectes}">
+                    <tr>
+                        <td>${collecte.id}</td>
+                        <td>${collecte.dateCollecte}</td>
+                        <td>${collecte.heureDebut}</td>
+                        <td>${collecte.heureFin}</td>
+                        <td>${collecte.lieu}</td>
+                        <td>${collecte.capaciteMaximale}</td>
+                        <td>${collecte.statut}</td>
 
-                <td>${collecte.id}</td>
-                <td>${collecte.nom}</td>
-                <td>${collecte.dateCollecte}</td>
-                <td>${collecte.heureDebut}</td>
-                <td>${collecte.heureFin}</td>
-                <td>${collecte.lieu}</td>
-                <td>${collecte.capaciteMaximale}</td>
+                        <td class="actions">
 
-                <td class="status">
-                    ${collecte.statut}
-                </td>
+                            <!-- Actions ADMIN -->
+                            <c:if test="${sessionScope.utilisateur.role == 'ADMIN'}">
 
-                <td>
+                                <!-- Modifier -->
+                                <a class="icon-btn modifier"
+                                   title="Modifier"
+                                   href="${pageContext.request.contextPath}/collectes?action=modifier&id=${collecte.id}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
-                    <a href="${pageContext.request.contextPath}/collectes?action=modifierForm&id=${collecte.id}"
-                       class="btn edit">
-                        Modifier
-                    </a>
+                                <!-- Terminer -->
+                                <c:if test="${collecte.statut == 'PLANIFIEE'}">
+                                    <form action="${pageContext.request.contextPath}/collectes"
+                                          method="post"
+                                          style="display:inline;">
 
-                    <form action="${pageContext.request.contextPath}/collectes"
-                          method="post"
-                          style="display:inline;">
+                                        <input type="hidden" name="action" value="terminer">
+                                        <input type="hidden" name="id" value="${collecte.id}">
 
-                        <input type="hidden"
-                               name="action"
-                               value="annuler">
+                                        <button type="submit"
+                                                title="Marquer comme terminée"
+                                                onclick="return confirm('Terminer cette collecte ?');">
+                                            ✓
+                                        </button>
+                                    </form>
+                                </c:if>
 
-                        <input type="hidden"
-                               name="id"
-                               value="${collecte.id}">
+                                <!-- Annuler -->
+                                <c:if test="${collecte.statut == 'PLANIFIEE'}">
+                                    <form action="${pageContext.request.contextPath}/collectes"
+                                          method="post"
+                                          style="display:inline;"
+                                          onsubmit="return confirm('Voulez-vous annuler cette collecte ?');">
 
-                        <button type="submit"
-                                class="btn cancel"
-                                onclick="return confirm('Voulez-vous annuler cette collecte ?')">
-                            Annuler
-                        </button>
+                                        <input type="hidden" name="action" value="annuler">
+                                        <input type="hidden" name="id" value="${collecte.id}">
 
-                    </form>
+                                        <button type="submit"
+                                                class="icon-btn annuler"
+                                                title="Annuler">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </form>
+                                </c:if>
 
-                    <a href="${pageContext.request.contextPath}/rendezvous?collecteId=${collecte.id}"
-                       class="btn details">
-                        Voir les rendez-vous
-                    </a>
+                                <!-- Supprimer -->
+                                <form action="${pageContext.request.contextPath}/collectes"
+                                      method="post"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Voulez-vous vraiment supprimer cette collecte ?');">
 
-                </td>
+                                    <input type="hidden" name="action" value="supprimer">
+                                    <input type="hidden" name="id" value="${collecte.id}">
 
-            </tr>
+                                    <button type="submit"
+                                            class="icon-btn supprimer"
+                                            title="Supprimer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
 
-        </c:forEach>
+                            </c:if>
 
-        <c:if test="${empty collectes}">
-            <tr>
-                <td colspan="9" class="empty">
-                    Aucune collecte disponible.
-                </td>
-            </tr>
-        </c:if>
+                            <!-- Action DONNEUR -->
+                            <c:if test="${sessionScope.utilisateur.role == 'DONNEUR'}">
+
+                                <c:if test="${collecte.statut == 'PLANIFIEE'}">
+                                    <a class="rendezvous"
+                                       href="${pageContext.request.contextPath}/rendezvous?action=demander&idCollecte=${collecte.id}">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        Demander un rendez-vous
+                                    </a>
+                                </c:if>
+
+                            </c:if>
+
+                        </td>
+                    </tr>
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
 
         </tbody>
-
     </table>
 
 </div>

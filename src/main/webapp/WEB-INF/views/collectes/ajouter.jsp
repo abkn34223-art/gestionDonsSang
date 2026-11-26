@@ -1,4 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,7 +10,7 @@
 </head>
 <body>
 
-<h1>Ajouter une collecte de sang</h1>
+<h2>Ajouter une collecte</h2>
 
 <form action="${pageContext.request.contextPath}/collectes"
       method="post">
@@ -19,7 +21,7 @@
     <input type="text" name="nom" required>
     <br><br>
 
-    <label>Date :</label>
+    <label>Date de collecte :</label>
     <input type="date" name="dateCollecte" required>
     <br><br>
 
@@ -35,16 +37,15 @@
     <input type="text" name="lieu" required>
     <br><br>
 
-    <label>Description :</label>
-    <textarea name="description"></textarea>
-    <br><br>
-
     <label>Capacité maximale :</label>
     <input type="number" name="capaciteMaximale"
            min="1" required>
     <br><br>
+    <label>Description :</label>
+    <textarea name="description"></textarea>
+    <br><br>
 
-    <button type="submit">Enregistrer</button>
+    <button type="submit">Ajouter</button>
 
 </form>
 

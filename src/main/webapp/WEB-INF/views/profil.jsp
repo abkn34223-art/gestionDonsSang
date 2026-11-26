@@ -21,6 +21,20 @@
 <p>Email : <%= utilisateur.getEmail() %></p>
 <p>Rôle : <%= utilisateur.getRole() %></p>
 
+<h2>Navigation</h2>
+
+<a href="${pageContext.request.contextPath}/collectes?action=liste">
+    Consulter les collectes
+</a>
+
+<br><br>
+
+<a href="<%= request.getContextPath() %>/rendezvous">
+    Consulter les rendez-vous
+</a>
+
+<br><br>
+
 <a href="${pageContext.request.contextPath}/deconnexion">Se déconnecter</a>
 
 </body>
