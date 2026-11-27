@@ -2,7 +2,7 @@
 <%@ page import="ma.ensa.model.Utilisateur" %>
 
 <% Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
-    if (utilisateur == null) {response.sendRedirect("login.jsp");
+    if (utilisateur == null) { response.sendRedirect(request.getContextPath() + "/connexion");
         return;}
 %>
 
@@ -21,19 +21,6 @@
 <p>Email : <%= utilisateur.getEmail() %></p>
 <p>Rôle : <%= utilisateur.getRole() %></p>
 
-<h2>Navigation</h2>
-
-<a href="${pageContext.request.contextPath}/collectes?action=liste">
-    Consulter les collectes
-</a>
-
-<br><br>
-
-<a href="<%= request.getContextPath() %>/rendezvous">
-    Consulter les rendez-vous
-</a>
-
-<br><br>
 
 <a href="${pageContext.request.contextPath}/deconnexion">Se déconnecter</a>
 

@@ -65,5 +65,4 @@ public class UtilisateurService {
             throw new RuntimeException("Email ou mot de passe incorrect !");}
         return utilisateur;
     }
-
 }

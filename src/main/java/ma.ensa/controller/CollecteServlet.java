@@ -51,6 +51,8 @@ public class CollecteServlet extends HttpServlet{
             request.setAttribute("collecte", collecte);
             request.getRequestDispatcher("/WEB-INF/views/collectes/modifier.jsp"
             ).forward(request, response);
+        }else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 

@@ -4,6 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Connexion - Don de sang</title>
+
+    <% if (request.getAttribute("erreur") != null) { %>
+    <p style="color:red; text-align:center;">
+        <%= request.getAttribute("erreur") %></p>
+    <% } %>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,13 +55,14 @@
     <p class="success">Inscription réussie ! Connectez-vous.</p>
     <% } %>
 
-    <form action="connexion" method="post">
+    <form action="<%= request.getContextPath() %>/connexion" method="post">
         <input type="email" name="email" placeholder="Adresse email" required>
         <input type="password" name="motDePasse" placeholder="Mot de passe" required>
         <button type="submit">Se connecter</button>
     </form>
 
-    <p style="text-align:center;">  Pas encore de compte ?<a href="inscription.jsp">S'inscrire</a></p>
+    <p style="text-align:center;">  Pas encore de compte ?
+        <a href="<%= request.getContextPath() %>/inscription">S'inscrire</a></p>
 </div>
 
 </body>

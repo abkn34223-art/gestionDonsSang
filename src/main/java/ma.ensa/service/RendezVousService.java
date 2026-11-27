@@ -2,9 +2,15 @@ package ma.ensa.service;
 
 import ma.ensa.dao.CollecteDAO;
 import ma.ensa.dao.DonneurDAO;
-import ma.ensa.model.*;
+import ma.ensa.model.RendezVous;
+import ma.ensa.model.Collecte;
+import ma.ensa.model.Donneur;
+import ma.ensa.model.StatutRendezVous;
+import ma.ensa.model.StatutCollecte;
 import ma.ensa.dao.RendezVousDAO;
 import java.util.List;
+import ma.ensa.model.Utilisateur;
+import ma.ensa.model.Role;
 
 public class RendezVousService {
     private RendezVousDAO rendezVousDAO;

@@ -6,6 +6,7 @@ import jakarta.servlet.http.*;
 import ma.ensa.model.*;
 import ma.ensa.service.RendezVousService;
 import ma.ensa.service.CollecteService;
+import java.time.LocalDateTime;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -42,15 +43,11 @@ public class RendezVousServlet extends HttpServlet {
 
             // ADMIN : consulter tous les rendez-vous
             if (utilisateur.getRole() == Role.ADMIN) {
-
                 List<RendezVous> liste;
-
                 if ("parDonneur".equals(action)) {
-
                     Long idDonneur = Long.parseLong(
                             request.getParameter("idDonneur")
                     );
-
                     liste = rendezVousService.listerParDonneur(idDonneur);
 
                 } else {
@@ -71,14 +68,11 @@ public class RendezVousServlet extends HttpServlet {
                 // Afficher ses rendez-vous
                 if (action == null || "mesRendezVous".equals(action)
                         || "historique".equals(action)) {
-
                     List<RendezVous> liste = rendezVousService.listerParDonneur(donneur.getId());
-
                     request.setAttribute("rendezVousList", liste);
-
                     String vue = "historique".equals(action)
                             ? "historique.jsp"
-                            : "mes-rendezvous.jsp";
+                            : "mesRendezVous.jsp";
 
                     request.getRequestDispatcher(
                             "/WEB-INF/views/rendezvous/" + vue
@@ -90,15 +84,10 @@ public class RendezVousServlet extends HttpServlet {
                 // Ajouter un rendez-vous : afficher les collectes
                 if ("ajouter".equals(action)) {
 
-                    List<Collecte> collectes =
-                            collecteService.listerCollectes();
-
+                    List<Collecte> collectes = collecteService.listerCollectes();
                     request.setAttribute("collectes", collectes);
-
-                    request.getRequestDispatcher(
-                            "/WEB-INF/views/rendezvous/demander.jsp"
+                    request.getRequestDispatcher("/WEB-INF/views/rendezvous/demander.jsp"
                     ).forward(request, response);
-
                     return;
                 }
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -127,55 +116,40 @@ public class RendezVousServlet extends HttpServlet {
             return;
         }
 
-        Utilisateur utilisateur =
-                (Utilisateur) session.getAttribute("utilisateur");
-
+        Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
         String action = request.getParameter("action");
-
         try {
-
             // DONNEUR : demander un rendez-vous
-            if ("demander".equals(action)
-                    && utilisateur.getRole() == Role.DONNEUR) {
-
+            if ("demander".equals(action) && utilisateur.getRole() == Role.DONNEUR) {
                 Donneur donneur = (Donneur) session.getAttribute("donneur");
                 Long idCollecte = Long.parseLong(request.getParameter("idCollecte"));
                 RendezVous rendezVous = new RendezVous();
                 // Associer la collecte par son identifiant
                 Collecte collecte = new Collecte();
                 collecte.setId(idCollecte);
-
                 rendezVous.setCollecte(collecte);
                 rendezVous.setDonneur(donneur);
-
-                rendezVous.setHeure(
-                        LocalTime.parse(request.getParameter("heure"))
-                );
-
+                rendezVous.setHeure(LocalTime.parse(request.getParameter("heure")));
+                rendezVous.setDateDemande(LocalDateTime.now());
                 // Le service effectue les vérifications métier
                 rendezVousService.demanderRendezVous(rendezVous);
-
                 response.sendRedirect(request.getContextPath() + "/rendezvous?action=mesRendezVous");
                 return;
             }
-
             // ANNULER : ADMIN ou propriétaire du rendez-vous
             if ("annuler".equals(action)) {
                 Long id = Long.parseLong(request.getParameter("id"));
                 RendezVous rendezVous = rendezVousService.trouverParId(id);
                 if (rendezVous == null) {
-                    throw new IllegalArgumentException(
-                            "Rendez-vous introuvable."
-                    );
+                    throw new IllegalArgumentException("Rendez-vous introuvable.");
                 }
                 // Vérifier les droits du donneur
                 if (utilisateur.getRole() != Role.ADMIN) {
                     Donneur donneur = (Donneur) session.getAttribute("donneur");
-
-                    if (utilisateur.getRole() != Role.DONNEUR) {
-                        response.sendError(
-                                HttpServletResponse.SC_FORBIDDEN
-                        );
+                    if (utilisateur.getRole() != Role.DONNEUR
+                            || donneur == null
+                            || !donneur.getId().equals(rendezVous.getDonneur().getId())) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN);
                         return;
                     }
                 }
@@ -207,18 +181,13 @@ public class RendezVousServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 
         } catch (IllegalArgumentException e) {
-
             request.setAttribute("erreur", e.getMessage());
-
             if (utilisateur.getRole() == Role.ADMIN) {
-
                 request.setAttribute(
                         "rendezVousList",
                         rendezVousService.listerRendezVous()
                 );
-
-                request.getRequestDispatcher(
-                        "/WEB-INF/views/rendezvous/mesRendezVous.jsp"
+                request.getRequestDispatcher("/WEB-INF/views/rendezvous/liste.jsp"
                 ).forward(request, response);
 
             } else {
@@ -234,9 +203,7 @@ public class RendezVousServlet extends HttpServlet {
                         "rendezVousList",
                         rendezVousService.listerParDonneur(donneur.getId())
                 );
-
-                request.getRequestDispatcher(
-                        "/WEB-INF/views/rendezvous/mes-rendezvous.jsp"
+                request.getRequestDispatcher("/WEB-INF/views/rendezvous/liste.jsp"
                 ).forward(request, response);
             }
         }

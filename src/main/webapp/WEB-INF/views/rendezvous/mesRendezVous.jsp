@@ -144,7 +144,7 @@
 
                                         <input type="hidden" name="action" value="annuler">
 
-                                        <input type="hidden" name="idRendezVous"
+                                        <input type="hidden" name="id"
                                                value="<%= rdv.getId() %>">
 
                                         <button type="submit" class="btn btn-sm btn-danger">

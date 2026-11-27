@@ -1,6 +1,9 @@
 package ma.ensa.controller;
 import ma.ensa.model.Utilisateur;
 import ma.ensa.service.UtilisateurService;
+import ma.ensa.model.Donneur;
+import ma.ensa.model.Role;
+import ma.ensa.service.DonneurService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +15,7 @@ import java.io.IOException;
 @WebServlet("/connexion")
 public class ConnexionServlet extends HttpServlet {
     private UtilisateurService utilisateurService = new UtilisateurService();
-
+    private DonneurService donneurService = new DonneurService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,12 +33,29 @@ public class ConnexionServlet extends HttpServlet {
 
         try {
             Utilisateur utilisateur = utilisateurService.connecter(email, motDePasse);
+            request.changeSessionId();
             HttpSession session = request.getSession();
             session.setAttribute("utilisateur", utilisateur);
 
             if (utilisateur.getRole() == ma.ensa.model.Role.ADMIN) {
                 response.sendRedirect(request.getContextPath() + "/admin");
-            } else {
+            } else if (utilisateur.getRole() == Role.DONNEUR) {
+
+                Donneur donneur = donneurService.chercherParUtilisateurId(
+                        utilisateur.getId()
+                );
+
+                if (donneur == null) {
+                    session.invalidate();
+                    request.setAttribute("erreur",
+                            "Aucun profil donneur associé à ce compte.");
+                    request.getRequestDispatcher("/WEB-INF/views/login.jsp")
+                            .forward(request, response);
+                    return;
+                }
+
+                session.setAttribute("donneur", donneur);
+
                 response.sendRedirect(request.getContextPath() + "/profil");
             }
 
